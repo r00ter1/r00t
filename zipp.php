@@ -1,6 +1,6 @@
 <?php
-// Fonksiyon: Belirtilen dosyaları zip olarak indirir
-function downloadFiles($files) {
+// Fonksiyon: Belirtilen dosyaları zip olarak oluşturur ve indirme bağlantısını döndürür
+function createZipAndReturnDownloadLink($files) {
     $zip = new ZipArchive();
     $zipName = 'files.zip';
     if ($zip->open($zipName, ZipArchive::CREATE) === TRUE) {
@@ -20,13 +20,10 @@ function downloadFiles($files) {
             }
         }
         $zip->close();
-        header("Content-type: application/zip");
-        header("Content-Disposition: attachment; filename=$zipName");
-        readfile($zipName);
-        unlink($zipName); // Zip dosyasını sildikten sonra
-        exit;
+        return $zipName;
     } else {
         echo "Zip dosyası oluşturulamadı.";
+        return false;
     }
 }
 
@@ -39,7 +36,14 @@ if(isset($_GET['dir'])) {
 
 if(isset($_GET['action']) && $_GET['action'] == 'download') {
     $files = $_GET['files'];
-    downloadFiles($files);
+    $zipFile = createZipAndReturnDownloadLink($files);
+    if ($zipFile) {
+        header("Content-type: application/zip");
+        header("Content-Disposition: attachment; filename=$zipFile");
+        readfile($zipFile);
+        unlink($zipFile); // Zip dosyasını sildikten sonra
+        exit;
+    }
 }
 
 $files = array_diff(scandir($currentDir), array('.', '..'));
@@ -76,7 +80,7 @@ $files = array_diff(scandir($currentDir), array('.', '..'));
                 <option value="<?php echo $currentDir.'/'.$file; ?>"><?php echo $file; ?></option>
             <?php endforeach; ?>
         </select><br>
-        <button type="submit">Download Selected Files</button>
+        <button id="downloadBtn" type="button">Download Selected Files</button>
     </form>
     <script>
         $(document).ready(function(){
@@ -93,6 +97,14 @@ $files = array_diff(scandir($currentDir), array('.', '..'));
 
             $('#files').change(function(){
                 $('#downloadForm button[type="submit"]').prop('disabled', $(this).val() == null);
+            });
+
+            $('#downloadBtn').click(function(){
+                var selectedFiles = $('#files').val();
+                if(selectedFiles && selectedFiles.length > 0) {
+                    $('#downloadForm').submit();
+                    $(this).prop('disabled', true).text('Downloading...');
+                }
             });
         });
     </script>
