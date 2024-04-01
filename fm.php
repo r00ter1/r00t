@@ -1,3 +1,5 @@
+<META NAME="robots" CONTENT="noindex,nofollow">
+
 <?php
 /* PHP File manager ver 1.4 */
 
